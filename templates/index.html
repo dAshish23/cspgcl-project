@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSPGCL Management System | Korba East Thermal Power Station</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+      </div>
+      <div class="brand-info">
+        <div class="brand-title">CSPGCL Management System</div>
+        <div class="brand-sub">Chhattisgarh State Power Generation Co. Ltd. • Korba East Thermal Power Station</div>
+      </div>
+    </div>
+
+    <div class="header-meta">
+      <div class="meta-item">
+        <span class="meta-label">System Time:</span>
+        <span class="meta-val" id="liveClock">--:--:--</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">DB Engine:</span>
+        <span class="status-badge status-online" id="dbStatusBadge">
+          <span class="status-dot"></span> <span id="dbStatusText">Connected (SQLite)</span>
+        </span>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="btnRefreshAll" title="Refresh all data">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN LAYOUT ================= -->
+  <div class="app-layout">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="app-sidebar">
+      <div class="sidebar-section-title">MAIN NAVIGATION</div>
+      <nav class="sidebar-nav">
+        <button class="nav-tab-btn active" data-tab="tab-dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-coal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          <span>Coal Storage</span>
+          <span class="nav-badge" id="navCoalBadge">0 MT</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-diesel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v6h4V2H3zm14 0h4v6h-4V2zm-9 6h6v14H8V8zm10 2h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3v-2h3V12h-3v-2zM3 10h3v12H3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"></path></svg>
+          <span>Diesel Storage</span>
+          <span class="nav-badge" id="navDieselBadge">0 L</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-employees">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span>Employees</span>
+          <span class="nav-badge" id="navEmpBadge">0</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-attendance">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>Attendance</span>
+          <span class="nav-badge badge-success" id="navAttBadge">0</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-section-title">REPORTS & TOOLS</div>
+      <nav class="sidebar-nav">
+        <button class="nav-tab-btn" data-tab="tab-reports">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <span>Reports & Logs</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-api-tools">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6-6-6"></path><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+          <span>REST API & SQL Query</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="author-tag">
+          <div class="author-name">Ashish Kumar Dahariya</div>
+          <div class="author-details">B.Tech (Hon) AI/DS • CSVTU Bhilai</div>
+          <div class="author-roll">Roll: 300012724015 | CE3605</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT WRAPPER -->
+    <main class="app-main">
+
+      <!-- ================= TAB 1: DASHBOARD (Fig 6.1) ================= -->
+      <section class="tab-pane active" id="tab-dashboard">
+        <div class="pane-header">
+          <div>
+            <h1 class="pane-title">Operational Dashboard</h1>
+            <p class="pane-sub">Real-time status overview of fuel reserves, stock movements, and plant personnel</p>
+          </div>
+          <div class="pane-actions">
+            <button class="btn btn-primary" onclick="openModal('modal-quick-attendance')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Quick Check-In/Out
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI SUMMARY CARDS -->
+        <div class="kpi-grid">
+          <!-- Coal Card -->
+          <div class="kpi-card coal-theme">
+            <div class="kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+            </div>
+            <div class="kpi-data">
+              <div class="kpi-label">Current Coal Net Stock</div>
+              <div class="kpi-value"><span id="dashCoalNet">--</span> <small>MT</small></div>
+              <div class="kpi-foot">
+                <span class="text-success font-mono">▲ In: <span id="dashCoalIn">0</span> MT</span>
+                <span class="text-danger font-mono" style="margin-left: 10px;">▼ Out: <span id="dashCoalOut">0</span> MT</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diesel Card -->
+          <div class="kpi-card diesel-theme">
+            <div class="kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v6h4V2H3zm14 0h4v6h-4V2zm-9 6h6v14H8V8z"/></svg>
+            </div>
+            <div class="kpi-data">
+              <div class="kpi-label">Current Diesel Net Stock</div>
+              <div class="kpi-value"><span id="dashDieselNet">--</span> <small>Litres</small></div>
+              <div class="kpi-foot">
+                <span class="text-success font-mono">▲ In: <span id="dashDieselIn">0</span> L</span>
+                <span class="text-danger font-mono" style="margin-left: 10px;">▼ Out: <span id="dashDieselOut">0</span> L</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Employees -->
+          <div class="kpi-card emp-theme">
+            <div class="kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+            </div>
+            <div class="kpi-data">
+              <div class="kpi-label">Registered Workforce</div>
+              <div class="kpi-value"><span id="dashTotalEmp">--</span> <small>Employees</small></div>
+              <div class="kpi-foot">
+                <span class="text-muted">Total registered plant staff</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Today's Attendance -->
+          <div class="kpi-card att-theme">
+            <div class="kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div class="kpi-data">
+              <div class="kpi-label">Present Today</div>
+              <div class="kpi-value"><span id="dashPresentToday">--</span> <small>On Duty</small></div>
+              <div class="kpi-foot">
+                <span class="text-accent font-mono">⚡ Active Clocked-in: <span id="dashActiveOnDuty">0</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STORAGE GAUGES & SUMMARY SECTION -->
+        <div class="dashboard-split">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Storage Level Indicators (CRSP Position)</div>
+              <span class="badge badge-info">Capacity Visualizer</span>
+            </div>
+            <div class="card-body">
+              <div class="storage-meter-block">
+                <div class="meter-info">
+                  <span class="meter-name">🪨 Coal Bunker & Yard Storage</span>
+                  <span class="meter-val"><strong id="gaugeCoalVal">0</strong> MT / 15,000 MT Cap</span>
+                </div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill coal-fill" id="gaugeCoalBar" style="width: 0%;"></div>
+                </div>
+                <div class="meter-sub">Korba East Thermal Power Station Daily Buffer Capacity: 15,000 MT</div>
+              </div>
+
+              <div class="storage-meter-block" style="margin-top: 24px;">
+                <div class="meter-info">
+                  <span class="meter-name">⛽ High Speed Diesel (HSD) Storage Tanks</span>
+                  <span class="meter-val"><strong id="gaugeDieselVal">0</strong> L / 50,000 L Cap</span>
+                </div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill diesel-fill" id="gaugeDieselBar" style="width: 0%;"></div>
+                </div>
+                <div class="meter-sub">Auxiliary Boiler Ignition & Emergency DG Tank Capacity: 50,000 Litres</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Quick Action Hub</div>
+              <span class="badge badge-primary">Direct Actions</span>
+            </div>
+            <div class="card-body">
+              <div class="quick-actions-list">
+                <button class="quick-btn" onclick="openModal('modal-coal')">
+                  <div class="quick-btn-icon bg-coal">+</div>
+                  <div class="quick-btn-text">
+                    <strong>Add Coal Stock Movement</strong>
+                    <span>Log incoming railway rake or boiler bunker feeding</span>
+                  </div>
+                </button>
+                <button class="quick-btn" onclick="openModal('modal-diesel')">
+                  <div class="quick-btn-icon bg-diesel">+</div>
+                  <div class="quick-btn-text">
+                    <strong>Add Diesel Stock Entry</strong>
+                    <span>Record tanker delivery or auxiliary generator usage</span>
+                  </div>
+                </button>
+                <button class="quick-btn" onclick="openModal('modal-employee')">
+                  <div class="quick-btn-icon bg-emp">+</div>
+                  <div class="quick-btn-text">
+                    <strong>Register New Employee</strong>
+                    <span>Enroll operator, technician, or station engineer</span>
+                  </div>
+                </button>
+                <button class="quick-btn" onclick="openModal('modal-quick-attendance')">
+                  <div class="quick-btn-icon bg-att">✓</div>
+                  <div class="quick-btn-text">
+                    <strong>One-Click Clock-In / Clock-Out</strong>
+                    <span>Record immediate shift arrival or departure</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECENT ACTIVITY TABLES -->
+        <div class="dashboard-split" style="margin-top: 24px;">
+          <!-- Recent Coal Move -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Recent Coal Transactions</div>
+              <button class="btn btn-outline btn-xs" onclick="switchTab('tab-coal')">View All</button>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th>Quantity (MT)</th>
+                      <th>Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashCoalRecentBody">
+                    <tr><td colspan="4" class="text-center text-muted">Loading transactions...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Today's Attendance Overview -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Today's Station Attendance Activity</div>
+              <button class="btn btn-outline btn-xs" onclick="switchTab('tab-attendance')">View All</button>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Dept</th>
+                      <th>Check In</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashAttRecentBody">
+                    <tr><td colspan="4" class="text-center text-muted">Loading attendance...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 2: COAL STORAGE (Fig 6.2) ================= -->
+      <section class="tab-pane" id="tab-coal">
+        <div class="pane-header">
+          <div>
+            <h1 class="pane-title">Coal Storage Management</h1>
+            <p class="pane-sub">Track thermal power coal intake (rakes from SECL mines) and boiler pulverizer consumption</p>
+          </div>
+          <div class="pane-actions">
+            <button class="btn btn-primary" onclick="openModal('modal-coal')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Add Coal Record
+            </button>
+          </div>
+        </div>
+
+        <!-- Coal Stock Banner -->
+        <div class="inventory-banner coal-banner">
+          <div class="inv-item">
+            <div class="inv-label">NET BALANCE STOCK</div>
+            <div class="inv-val" id="coalBannerNet">0.00 <span class="inv-unit">MT</span></div>
+          </div>
+          <div class="inv-divider"></div>
+          <div class="inv-item">
+            <div class="inv-label">TOTAL RECEIPTS (IN)</div>
+            <div class="inv-val text-success" id="coalBannerIn">0.00 <span class="inv-unit">MT</span></div>
+          </div>
+          <div class="inv-divider"></div>
+          <div class="inv-item">
+            <div class="inv-label">TOTAL CONSUMED (OUT)</div>
+            <div class="inv-val text-danger" id="coalBannerOut">0.00 <span class="inv-unit">MT</span></div>
+          </div>
+          <div class="inv-divider"></div>
+          <div class="inv-item">
+            <div class="inv-label">TOTAL TRANSACTIONS</div>
+            <div class="inv-val" id="coalBannerCount">0</div>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar card">
+          <div class="filter-group">
+            <label>Search:</label>
+            <input type="text" id="coalSearchInput" class="form-control" placeholder="Search remarks or date...">
+          </div>
+          <div class="filter-group">
+            <label>Type:</label>
+            <select id="coalTypeFilter" class="form-control">
+              <option value="">All Types</option>
+              <option value="IN">IN (Incoming / Receipts)</option>
+              <option value="OUT">OUT (Outgoing / Consumption)</option>
+            </select>
+          </div>
+          <div class="filter-group" style="align-self: flex-end;">
+            <button class="btn btn-outline btn-sm" onclick="exportTableToCSV('coal-data-table', 'CSPGCL_Coal_Inventory.csv')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Coal Table -->
+        <div class="card mt-3">
+          <div class="table-responsive">
+            <table class="data-table" id="coal-data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Recorded On</th>
+                  <th>Type</th>
+                  <th>Quantity (MT)</th>
+                  <th>Remarks / Destination</th>
+                  <th>Created At</th>
+                  <th>Last Updated</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="coalTableBody">
+                <tr><td colspan="8" class="text-center text-muted">Loading coal records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 3: DIESEL STORAGE (Fig 6.3) ================= -->
+      <section class="tab-pane" id="tab-diesel">
+        <div class="pane-header">
+          <div>
+            <h1 class="pane-title">Diesel Storage Management</h1>
+            <p class="pane-sub">Monitor High Speed Diesel (HSD) used for auxiliary oil-firing startup, backup DG sets & heavy plant vehicles</p>
+          </div>
+          <div class="pane-actions">
+            <button class="btn btn-primary" onclick="openModal('modal-diesel')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Add Diesel Record
+            </button>
+          </div>
+        </div>
+
+        <!-- Diesel Stock Banner -->
+        <div class="inventory-banner diesel-banner">
+          <div class="inv-item">
+            <div class="inv-label">NET DIESEL BALANCE</div>
+            <div class="inv-val" id="dieselBannerNet">0.00 <span class="inv-unit">Litres</span></div>
+          </div>
+          <div class="inv-divider"></div>
+          <div class="inv-item">
+            <div class="inv-label">TOTAL RECEIPTS (IN)</div>
+            <div class="inv-val text-success" id="dieselBannerIn">0.00 <span class="inv-unit">Litres</span></div>
+          </div>
+          <div class="inv-divider"></div>
+          <div class="inv-item">
+            <div class="inv-label">TOTAL ISSUED (OUT)</div>
+            <div class="inv-val text-danger" id="dieselBannerOut">0.00 <span class="inv-unit">Litres</span></div>
+          </div>
+          <div class="inv-divider"></div>
+          <div class="inv-item">
+            <div class="inv-label">TOTAL TRANSACTIONS</div>
+            <div class="inv-val" id="dieselBannerCount">0</div>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar card">
+          <div class="filter-group">
+            <label>Search:</label>
+            <input type="text" id="dieselSearchInput" class="form-control" placeholder="Search remarks or date...">
+          </div>
+          <div class="filter-group">
+            <label>Type:</label>
+            <select id="dieselTypeFilter" class="form-control">
+              <option value="">All Types</option>
+              <option value="IN">IN (Incoming / Tanker)</option>
+              <option value="OUT">OUT (Outgoing / Issued)</option>
+            </select>
+          </div>
+          <div class="filter-group" style="align-self: flex-end;">
+            <button class="btn btn-outline btn-sm" onclick="exportTableToCSV('diesel-data-table', 'CSPGCL_Diesel_Inventory.csv')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Diesel Table -->
+        <div class="card mt-3">
+          <div class="table-responsive">
+            <table class="data-table" id="diesel-data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Recorded On</th>
+                  <th>Type</th>
+                  <th>Quantity (Litres)</th>
+                  <th>Remarks / Purpose</th>
+                  <th>Created At</th>
+                  <th>Last Updated</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="dieselTableBody">
+                <tr><td colspan="8" class="text-center text-muted">Loading diesel records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 4: EMPLOYEES (Fig 6.4) ================= -->
+      <section class="tab-pane" id="tab-employees">
+        <div class="pane-header">
+          <div>
+            <h1 class="pane-title">Employee Master Records</h1>
+            <p class="pane-sub">Manage plant engineers, operators, technicians, and supervisory personnel at Korba East</p>
+          </div>
+          <div class="pane-actions">
+            <button class="btn btn-primary" onclick="openModal('modal-employee')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Add New Employee
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar card">
+          <div class="filter-group">
+            <label>Search Employee:</label>
+            <input type="text" id="empSearchInput" class="form-control" placeholder="Search by name, ID or designation...">
+          </div>
+          <div class="filter-group">
+            <label>Department:</label>
+            <select id="empDeptFilter" class="form-control">
+              <option value="">All Departments</option>
+              <option value="Coal Handling">Coal Handling</option>
+              <option value="Boiler Operation">Boiler Operation</option>
+              <option value="Turbine Maintenance">Turbine Maintenance</option>
+              <option value="Electrical Department">Electrical Department</option>
+              <option value="Control & Instrumentation">Control & Instrumentation</option>
+              <option value="Stores & Procurement">Stores & Procurement</option>
+              <option value="Quality Assurance">Quality Assurance</option>
+              <option value="Safety and Environment">Safety and Environment</option>
+            </select>
+          </div>
+          <div class="filter-group" style="align-self: flex-end;">
+            <button class="btn btn-outline btn-sm" onclick="exportTableToCSV('employees-data-table', 'CSPGCL_Employees.csv')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Employee Cards / Table -->
+        <div class="card mt-3">
+          <div class="table-responsive">
+            <table class="data-table" id="employees-data-table">
+              <thead>
+                <tr>
+                  <th>Emp ID</th>
+                  <th>Full Name</th>
+                  <th>Designation</th>
+                  <th>Department</th>
+                  <th>Contact Number</th>
+                  <th>Date of Joining</th>
+                  <th>Enrolled On</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="empTableBody">
+                <tr><td colspan="8" class="text-center text-muted">Loading employee records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 5: ATTENDANCE (Fig 6.5) ================= -->
+      <section class="tab-pane" id="tab-attendance">
+        <div class="pane-header">
+          <div>
+            <h1 class="pane-title">Employee Attendance Module</h1>
+            <p class="pane-sub">Shift check-in/check-out logs, real-time duty status, and attendance tracking</p>
+          </div>
+          <div class="pane-actions">
+            <button class="btn btn-secondary" onclick="openModal('modal-quick-attendance')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              Quick Punch (In/Out)
+            </button>
+            <button class="btn btn-primary" onclick="openModal('modal-attendance')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Log Custom Attendance
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar card">
+          <div class="filter-group">
+            <label>Filter by Date:</label>
+            <input type="date" id="attDateFilter" class="form-control">
+          </div>
+          <div class="filter-group">
+            <label>Employee:</label>
+            <select id="attEmpFilter" class="form-control">
+              <option value="">All Employees</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Status:</label>
+            <select id="attStatusFilter" class="form-control">
+              <option value="">All Statuses</option>
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+              <option value="Half-Day">Half-Day</option>
+            </select>
+          </div>
+          <div class="filter-group" style="align-self: flex-end;">
+            <button class="btn btn-outline btn-sm" onclick="clearAttendanceFilters()">Reset Filters</button>
+            <button class="btn btn-outline btn-sm" onclick="exportTableToCSV('attendance-data-table', 'CSPGCL_Attendance.csv')">Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Attendance Table -->
+        <div class="card mt-3">
+          <div class="table-responsive">
+            <table class="data-table" id="attendance-data-table">
+              <thead>
+                <tr>
+                  <th>Att ID</th>
+                  <th>Employee Name</th>
+                  <th>Department</th>
+                  <th>Check-In Time</th>
+                  <th>Check-Out Time</th>
+                  <th>Status</th>
+                  <th>Recorded At</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="attTableBody">
+                <tr><td colspan="8" class="text-center text-muted">Loading attendance records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 6: REPORTS & LOGS (Fig 6.9) ================= -->
+      <section class="tab-pane" id="tab-reports">
+        <div class="pane-header">
+          <div>
+            <h1 class="pane-title">Reports & Station Analytics</h1>
+            <p class="pane-sub">Consolidated inventory stock position (CRSP), attendance logs, and printable records</p>
+          </div>
+          <div class="pane-actions">
+            <button class="btn btn-primary" onclick="window.print()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              Print / Save PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="reports-container">
+          <!-- Report 1: Coal Receipt & Stock Position (CRSP) -->
+          <div class="card report-box">
+            <div class="card-header">
+              <div class="card-title">1. Coal Receipt & Stock Position (CRSP) Summary</div>
+              <span class="badge badge-primary">Thermal Plant Fuel</span>
+            </div>
+            <div class="card-body">
+              <div class="report-meta-grid">
+                <div><strong>Station:</strong> Korba East Thermal Power Station</div>
+                <div><strong>Generating Capacity:</strong> 4x210 MW & Modern Units</div>
+                <div><strong>Standard Buffer Norm:</strong> 15–21 Days Operational Stock</div>
+                <div><strong>Report Generated:</strong> <span class="reportTimestamp">--</span></div>
+              </div>
+              <div class="summary-table-wrap mt-3">
+                <table class="report-table">
+                  <thead>
+                    <tr>
+                      <th>Inventory Domain</th>
+                      <th>Total Incoming (IN)</th>
+                      <th>Total Outgoing (OUT)</th>
+                      <th>Current Net Stock</th>
+                      <th>Operational Assessment</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Thermal Coal Fuel</strong></td>
+                      <td><span id="repCoalIn">--</span> MT</td>
+                      <td><span id="repCoalOut">--</span> MT</td>
+                      <td><strong class="text-accent" id="repCoalNet">--</strong> MT</td>
+                      <td><span class="badge badge-success">Adequate Boiler Reserves</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>High Speed Diesel (HSD)</strong></td>
+                      <td><span id="repDieselIn">--</span> L</td>
+                      <td><span id="repDieselOut">--</span> L</td>
+                      <td><strong class="text-accent" id="repDieselNet">--</strong> L</td>
+                      <td><span class="badge badge-success">Sufficient for Black-Start & Gen</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Report 2: Shift Workforce Deployment -->
+          <div class="card report-box mt-3">
+            <div class="card-header">
+              <div class="card-title">2. Shift Attendance & Workforce Deployment Report</div>
+              <span class="badge badge-info">HR / Operations</span>
+            </div>
+            <div class="card-body">
+              <div class="report-meta-grid">
+                <div><strong>Total Registered Staff:</strong> <span id="repEmpCount">0</span></div>
+                <div><strong>Logged Present Today:</strong> <span id="repEmpPresent">0</span></div>
+                <div><strong>Currently Clocked-In:</strong> <span id="repEmpActive">0</span></div>
+                <div><strong>Attendance Turnout:</strong> <span id="repTurnout">0%</span></div>
+              </div>
+              <div class="mt-3">
+                <p class="text-muted text-sm">Below is the joined listing of the latest workforce records with department assignments.</p>
+                <div class="table-responsive">
+                  <table class="data-table" id="report-att-summary-table">
+                    <thead>
+                      <tr>
+                        <th>Employee Name</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Check-In</th>
+                        <th>Check-Out</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="repAttBody">
+                      <tr><td colspan="6" class="text-center text-muted">Loading report data...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 7: REST API & SQL QUERY (Fig 6.6, 6.7, 6.8) ================= -->
+      <section class="tab-pane" id="tab-api-tools">
+        <div class="pane-header">
+          <div>
+            <h1 class="pane-title">REST API & SQL Query Explorer</h1>
+            <p class="pane-sub">Interactive utility replicating Fig 6.6 (Schema info), Fig 6.7 (REST API JSON), and Fig 6.8 (Database Query Output)</p>
+          </div>
+        </div>
+
+        <div class="dashboard-split">
+          <!-- Live API Tester (Fig 6.7) -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">REST API Endpoint Inspector (Fig 6.7)</div>
+              <span class="badge badge-primary">Table 5.1 Endpoints</span>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label>Select Endpoint to Test:</label>
+                <div class="input-group">
+                  <select id="apiEndpointSelector" class="form-control">
+                    <option value="/api/health">GET /api/health (System Health)</option>
+                    <option value="/api/summary">GET /api/summary (Dashboard Summary)</option>
+                    <option value="/api/coal">GET /api/coal (Coal Inventory + Net Stock)</option>
+                    <option value="/api/diesel">GET /api/diesel (Diesel Inventory + Net Stock)</option>
+                    <option value="/api/employees">GET /api/employees (Employee List)</option>
+                    <option value="/api/attendance">GET /api/attendance (Joined Attendance)</option>
+                    <option value="/api/db-tables">GET /api/db-tables (Schema & Counts)</option>
+                  </select>
+                  <button class="btn btn-primary" onclick="testSelectedApi()">Execute Call</button>
+                </div>
+              </div>
+
+              <div class="api-output-box mt-3">
+                <div class="api-output-header">
+                  <span>HTTP Response Status: <strong id="apiStatusBadge">200 OK</strong></span>
+                  <button class="btn btn-outline btn-xs" onclick="copyApiOutput()">Copy JSON</button>
+                </div>
+                <pre class="json-viewer" id="apiResponseViewer">Click "Execute Call" to test the selected REST API endpoint...</pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Safe SQL Query Runner (Fig 6.8) -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Live SQL Query Runner (Fig 6.8)</div>
+              <span class="badge badge-info">Listing 4.3 & 4.4</span>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label>Select Preset Query or Enter Custom SELECT Query:</label>
+                <select id="sqlPresetSelector" class="form-control" onchange="loadPresetSql()">
+                  <option value="coal_calc">Listing 4.4: Calculate Coal Net Stock (IN - OUT)</option>
+                  <option value="diesel_calc">Calculate Diesel Net Stock (IN - OUT)</option>
+                  <option value="join_att">Listing 4.3: Attendance Joined with Employees</option>
+                  <option value="all_emp">Select All Active Employees Order by ID</option>
+                  <option value="recent_tx">Recent Stock Inflows & Issues</option>
+                </select>
+              </div>
+              <div class="form-group mt-2">
+                <textarea id="sqlQueryInput" class="form-control code-editor" rows="4">SELECT 
+  SUM(CASE WHEN type = 'IN' THEN quantity_mt ELSE 0 END) - 
+  SUM(CASE WHEN type = 'OUT' THEN quantity_mt ELSE 0 END) AS net_stock_mt 
+FROM coal_storage;</textarea>
+              </div>
+              <button class="btn btn-accent btn-sm" onclick="runSqlRunnerQuery()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                Execute SQL Query
+              </button>
+
+              <div class="sql-result-container mt-3">
+                <div class="sql-result-meta" id="sqlResultMeta">Results will appear here</div>
+                <div class="table-responsive sql-table-scroll" id="sqlTableContainer">
+                  <table class="data-table" id="sqlDynamicTable">
+                    <!-- Populated dynamically -->
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Database Tables Schema Inspection (Fig 6.6) -->
+        <div class="card mt-3">
+          <div class="card-header">
+            <div class="card-title">Database Tables in MySQL / SQLite (Fig 6.6)</div>
+            <span class="badge badge-success">3NF Normalized Entities</span>
+          </div>
+          <div class="card-body">
+            <div class="tables-grid" id="dbTablesGrid">
+              <!-- Dynamically populated schema blocks -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Modal: Coal Stock Entry -->
+  <div class="modal-backdrop" id="modal-coal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalCoalTitle">Record Coal Storage Movement</h3>
+        <button class="modal-close" onclick="closeModal('modal-coal')">&times;</button>
+      </div>
+      <form id="coalForm" onsubmit="handleCoalSubmit(event)">
+        <input type="hidden" id="coalEditId" value="">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Movement Type <span class="text-danger">*</span></label>
+            <select id="coalType" class="form-control" required>
+              <option value="IN">IN (Incoming Rake / Railway Receipt)</option>
+              <option value="OUT">OUT (Bunker Feed / Pulverizer Mill Consumption)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Quantity in Metric Tonnes (MT) <span class="text-danger">*</span></label>
+            <input type="number" id="coalQuantity" class="form-control" step="0.01" min="0.01" placeholder="e.g. 1500.50" required>
+          </div>
+          <div class="form-group">
+            <label>Date of Record <span class="text-danger">*</span></label>
+            <input type="date" id="coalRecordedOn" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Remarks / Origin / Siding / Unit Details</label>
+            <input type="text" id="coalRemarks" class="form-control" placeholder="e.g. Rake received from SECL Gevra siding">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-coal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveCoal">Save Coal Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Diesel Stock Entry -->
+  <div class="modal-backdrop" id="modal-diesel">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalDieselTitle">Record Diesel Storage Movement</h3>
+        <button class="modal-close" onclick="closeModal('modal-diesel')">&times;</button>
+      </div>
+      <form id="dieselForm" onsubmit="handleDieselSubmit(event)">
+        <input type="hidden" id="dieselEditId" value="">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Movement Type <span class="text-danger">*</span></label>
+            <select id="dieselType" class="form-control" required>
+              <option value="IN">IN (HSD Tanker Consignment Receipt)</option>
+              <option value="OUT">OUT (Auxiliary Ignition / DG Set / Machinery)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Quantity in Litres <span class="text-danger">*</span></label>
+            <input type="number" id="dieselQuantity" class="form-control" step="0.01" min="0.01" placeholder="e.g. 5000.00" required>
+          </div>
+          <div class="form-group">
+            <label>Date of Record <span class="text-danger">*</span></label>
+            <input type="date" id="dieselRecordedOn" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Remarks / Tank Number / Unit</label>
+            <input type="text" id="dieselRemarks" class="form-control" placeholder="e.g. Bulk tanker receipt from IOCL Korba Depot">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-diesel')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveDiesel">Save Diesel Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Employee Form -->
+  <div class="modal-backdrop" id="modal-employee">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalEmpTitle">Register New Employee</h3>
+        <button class="modal-close" onclick="closeModal('modal-employee')">&times;</button>
+      </div>
+      <form id="employeeForm" onsubmit="handleEmployeeSubmit(event)">
+        <input type="hidden" id="empEditId" value="">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Full Name <span class="text-danger">*</span></label>
+            <input type="text" id="empName" class="form-control" placeholder="e.g. Ramesh Kumar" required>
+          </div>
+          <div class="form-group">
+            <label>Designation</label>
+            <input type="text" id="empDesignation" class="form-control" placeholder="e.g. Plant Operator / Junior Engineer">
+          </div>
+          <div class="form-group">
+            <label>Department</label>
+            <select id="empDepartment" class="form-control">
+              <option value="Coal Handling">Coal Handling</option>
+              <option value="Boiler Operation">Boiler Operation</option>
+              <option value="Turbine Maintenance">Turbine Maintenance</option>
+              <option value="Electrical Department">Electrical Department</option>
+              <option value="Control & Instrumentation">Control & Instrumentation</option>
+              <option value="Stores & Procurement">Stores & Procurement</option>
+              <option value="Quality Assurance">Quality Assurance</option>
+              <option value="Safety and Environment">Safety and Environment</option>
+              <option value="Civil Department">Civil Department</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Contact Number</label>
+            <input type="text" id="empContact" class="form-control" placeholder="e.g. 9876543210">
+          </div>
+          <div class="form-group">
+            <label>Date of Joining</label>
+            <input type="date" id="empJoining" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-employee')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveEmp">Save Employee</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Custom Attendance Entry -->
+  <div class="modal-backdrop" id="modal-attendance">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalAttTitle">Log Custom Attendance</h3>
+        <button class="modal-close" onclick="closeModal('modal-attendance')">&times;</button>
+      </div>
+      <form id="attendanceForm" onsubmit="handleAttendanceSubmit(event)">
+        <input type="hidden" id="attEditId" value="">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Select Employee <span class="text-danger">*</span></label>
+            <select id="attEmpSelect" class="form-control" required>
+              <option value="">-- Choose Employee --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Check-In Datetime <span class="text-danger">*</span></label>
+            <input type="datetime-local" id="attCheckIn" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Check-Out Datetime (Optional)</label>
+            <input type="datetime-local" id="attCheckOut" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Attendance Status</label>
+            <select id="attStatus" class="form-control">
+              <option value="Present">Present</option>
+              <option value="Half-Day">Half-Day</option>
+              <option value="Absent">Absent</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-attendance')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveAtt">Save Attendance Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Quick Clock-In / Clock-Out (Fig 6.5) -->
+  <div class="modal-backdrop" id="modal-quick-attendance">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Quick Punch: Attendance Check-In / Check-Out</h3>
+        <button class="modal-close" onclick="closeModal('modal-quick-attendance')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted text-sm">Select an employee below to punch instantaneous shift arrival or departure timestamp.</p>
+        <div class="form-group mt-3">
+          <label>Employee:</label>
+          <select id="quickPunchEmpSelect" class="form-control">
+            <!-- Populated -->
+          </select>
+        </div>
+        <div class="quick-punch-buttons mt-4">
+          <button class="btn btn-success btn-lg flex-1" onclick="submitQuickCheckIn()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Clock-In (Check-In)
+          </button>
+          <button class="btn btn-danger btn-lg flex-1" onclick="submitQuickCheckOut()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+            Clock-Out (Check-Out)
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modal-quick-attendance')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Employee Detail & Attendance History -->
+  <div class="modal-backdrop" id="modal-emp-details">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title" id="empDetailTitle">Employee Profile & History</h3>
+        <button class="modal-close" onclick="closeModal('modal-emp-details')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="emp-profile-header" id="empProfileCard">
+          <!-- Populated dynamically -->
+        </div>
+        <h4 class="mt-4 mb-2">Recent Attendance Records</h4>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Check-In</th>
+                <th>Check-Out</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="empDetailAttBody">
+              <tr><td colspan="4" class="text-center text-muted">No attendance logs found</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modal-emp-details')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- MAIN APPLICATION JAVASCRIPT -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
+
